@@ -201,10 +201,6 @@ void manageInter() {
 
 
 void loop() {
-  //getButtonA();
-  //getButtonB();
-  //getButtonC();
-  //getStep();
   manageInter();
   delay(100);
 }
