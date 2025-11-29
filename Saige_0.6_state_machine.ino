@@ -40,10 +40,10 @@ unsigned long lastTimeButtonC_StateChanged = millis();  //debounce variable.
 unsigned long lastTimeStep_StateChanged = millis();     //debounce variable.
 unsigned long debounceDuration = 50;                    //amount of millis() system waits for button press.
 unsigned long stepDebounceDuration = 500;               //amount of millis() system waits for step counter.
-
 int stepCount;  //step count variable.
 
-
+ bool screenLoaded = false;
+  int currentScreen = 0;
 void setup() {
   Serial.begin(115200);          //Begins serial communication.
   Wire.begin(I2C_SDA, I2C_SCL);  //Initializes Data & Clock pins for I2C communication.
@@ -76,7 +76,9 @@ void setup() {
   screen.setRotation(3);
   // Clear the screen before writing to it
   screen.fillScreen(TFT_BLACK);
-  screen.setTextColor(TFT_WHITE, TFT_WHITE);
+  screen.setTextColor(TFT_ORANGE, TFT_BLACK);
+  screen.setTextSize(4);
+
   // Set X and Y coordinates for center of display
   int centerX = SCREEN_WIDTH / 2;
   int centerY = SCREEN_HEIGHT / 2;
@@ -198,9 +200,34 @@ void manageInter() {
   }
 }
 
+void loadScreen(bool &screenLoaded, int &currentScreen){
+  if(screenLoaded == false && currentScreen == 0){
+    screen.fillScreen(TFT_BLACK);
+    screen.setTextSize(4);
+    screen.drawString("MAIN.",80,100);
+    screenLoaded = true;
+  } else if (screenLoaded == false && currentScreen == 1){
+          screen.setTextColor(TFT_BLACK,TFT_BLACK);
+      screen.drawString("MAIN.",80,100);
+      screen.setTextColor(TFT_ORANGE,TFT_BLACK);
+      screen.drawString("STEP.",80,100);
+      screenLoaded = true;
+  }
+}
 
+void manageScreen(bool &screenLoaded, int &currentScreen){
+  int buttonA = pcf.digitalRead(PCF_BUTTON_A);
+  if (screenLoaded == true && currentScreen == 0){
+    if(buttonA == 0){
+      screenLoaded = false;
+      currentScreen = 1;
+    }
+  }
+}
 
 void loop() {
+  loadScreen(screenLoaded,currentScreen);
+  manageScreen(screenLoaded, currentScreen);
   manageInter();
   delay(100);
 }
